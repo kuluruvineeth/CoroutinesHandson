@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import kotlinx.coroutines.*
+import kotlin.system.measureTimeMillis
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,34 +14,25 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val job = GlobalScope.launch(Dispatchers.Default) {
-            /*repeat(5){
-                Log.d(TAG,"Coroutine is still working.....")
-                delay(1000)
-            }*/
-            Log.d(TAG,"Starting long running calculation...")
-            withTimeout(3000){
-                for(i in 30..50){
-                    if(isActive){
-                        Log.d(TAG,"Result for i = $i: ${fib(i)}")
-                    }
-                }
+        GlobalScope.launch(Dispatchers.IO) {
+            val time = measureTimeMillis {
+                val answer1 = async{networkCall1()}
+                val answer2 = async{networkCall2()}
+                Log.d(TAG,"Answer1 is ${answer1.await()}")
+                Log.d(TAG,"Answer2 is ${answer2.await()}")
             }
-            Log.d(TAG,"Ending long running calculation...")
+            Log.d(TAG,"Time taken $time")
         }
 
-        /*runBlocking {
-            delay(2000)
-            job.cancel() //cancel the job
-            //job.join() //waiting till this job gets completed
-            Log.d(TAG,"Cancelled job..")
-        }*/
+    }
+    suspend fun networkCall1(): String {
+        delay(3000)
+        return "Answer 1"
     }
 
-    fun fib(n: Int): Long {
-        return if(n==0) 0
-        else if(n==1) 1
-        else fib(n-1) + fib(n-2)
+    suspend fun networkCall2(): String{
+        delay(3000)
+        return "Answer 2"
     }
 
 }
