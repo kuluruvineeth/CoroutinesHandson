@@ -12,21 +12,25 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        var tvDummy = findViewById<TextView>(R.id.tvDummy)
 
-        GlobalScope.launch(Dispatchers.IO) {
-            Log.d(TAG,"Starting coroutine in thread ${Thread.currentThread().name}")
-            val answer = doNetworkCall()
-            withContext(Dispatchers.Main){
-                Log.d(TAG,"Starting main thread ${Thread.currentThread().name}")
-                tvDummy.text = answer
+        Log.d(TAG,"Before runBlocking")
+        runBlocking {
+            launch(Dispatchers.IO) {
+                delay(3000L)
+                Log.d(TAG,"Finished IO Coroutine")
             }
+            launch(Dispatchers.IO) {
+                delay(3000L)
+                Log.d(TAG,"Finished IO Coroutine 2")
+            }
+            Log.d(TAG,"start of runBlocking")
+            delay(2000L)
+            Log.d(TAG,"End of runBlocking")
         }
-
+        /*Log.d(TAG,"start of runBlocking")
+        Thread.sleep(5000L)
+        Log.d(TAG,"End of runBlocking")*/
+        Log.d(TAG,"After runBlocking")
     }
 
-    suspend fun doNetworkCall(): String{
-        delay(2000)
-        return "This is the customized suspend function"
-    }
 }
