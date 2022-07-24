@@ -3,9 +3,8 @@ package com.kuluruvineeth.coroutineshandson
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import android.widget.TextView
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,12 +12,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        var tvDummy = findViewById<TextView>(R.id.tvDummy)
 
-        GlobalScope.launch {
-            val networkCallAnswer = doNetworkCall()
-            val networkCallAnswer2 = doNetworkCall2()
-            Log.d(TAG,networkCallAnswer)
-            Log.d(TAG,networkCallAnswer2)
+        GlobalScope.launch(Dispatchers.IO) {
+            Log.d(TAG,"Starting coroutine in thread ${Thread.currentThread().name}")
+            val answer = doNetworkCall()
+            withContext(Dispatchers.Main){
+                Log.d(TAG,"Starting main thread ${Thread.currentThread().name}")
+                tvDummy.text = answer
+            }
         }
 
     }
@@ -26,10 +28,5 @@ class MainActivity : AppCompatActivity() {
     suspend fun doNetworkCall(): String{
         delay(2000)
         return "This is the customized suspend function"
-    }
-
-    suspend fun doNetworkCall2(): String{
-        delay(3000)
-        return "This is second suspend function"
     }
 }
