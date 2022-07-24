@@ -1,9 +1,12 @@
 package com.kuluruvineeth.coroutineshandson
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
 
@@ -13,26 +16,29 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val button = findViewById<Button>(R.id.btnStartActivity)
 
-        GlobalScope.launch(Dispatchers.IO) {
-            val time = measureTimeMillis {
-                val answer1 = async{networkCall1()}
-                val answer2 = async{networkCall2()}
-                Log.d(TAG,"Answer1 is ${answer1.await()}")
-                Log.d(TAG,"Answer2 is ${answer2.await()}")
+        button.setOnClickListener{
+            /*GlobalScope.launch {
+                while(true){
+                    delay(1000)
+                    Log.d(TAG,"Still running....")
+                }
+            }*/
+            lifecycleScope.launch {
+                while(true){
+                    delay(1000)
+                    Log.d(TAG,"Still running1....")
+                }
             }
-            Log.d(TAG,"Time taken $time")
+            GlobalScope.launch {
+                delay(5000)
+                Intent(this@MainActivity,SecondActivity::class.java).also{
+                    startActivity(it)
+                    finish()
+                }
+            }
         }
-
-    }
-    suspend fun networkCall1(): String {
-        delay(3000)
-        return "Answer 1"
-    }
-
-    suspend fun networkCall2(): String{
-        delay(3000)
-        return "Answer 2"
     }
 
 }
